@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Government Website Theme Colors */
+:root {
+  --gov-green-primary: #4a9d5f;
+  --gov-green-dark: #3a7d4f;
+  --gov-green-light: #5cb370;
+  --gov-navy: #2c3e50;
+  --gov-text-primary: #2d3748;
+  --gov-text-secondary: #718096;
+  --gov-bg-light: #f7fafc;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
