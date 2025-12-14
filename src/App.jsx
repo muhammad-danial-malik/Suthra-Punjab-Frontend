@@ -40,21 +40,126 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/users" element={<User />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/penalties" element={<Penalties />} />
-        <Route path="/stats" element={<Stats />} />
-        <Route path="/department" element={<Department />} />
-        <Route path="/circles" element={<Circle />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/maps" element={<Maps />} />
-        <Route path="/heap-history" element={<HeapHistory />} />
-        <Route path="/penalty-types" element={<PenaltyTypes />} />
-        <Route path="/billing-reports" element={<BillingReports />} />
-        <Route path="/billing-types" element={<BillingTypes />} />
-        <Route path="/update/:id" element={<UpdatePenalty />} />
-        <Route path="/action/:id" element={<Action />} />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <User />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <ResetPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/penalties"
+          element={
+            <ProtectedRoute>
+              <Penalties />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stats"
+          element={
+            <ProtectedRoute>
+              <Stats />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/department"
+          element={
+            <ProtectedRoute>
+              <Department />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/circles"
+          element={
+            <ProtectedRoute>
+              <Circle />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/maps"
+          element={
+            <ProtectedRoute>
+              <Maps />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/heap-history"
+          element={
+            <ProtectedRoute>
+              <HeapHistory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/penalty-types"
+          element={
+            <ProtectedRoute>
+              <PenaltyTypes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/billing-reports"
+          element={
+            <ProtectedRoute>
+              <BillingReports />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/billing-types"
+          element={
+            <ProtectedRoute>
+              <BillingTypes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/update/:id"
+          element={
+            <ProtectedRoute>
+              <UpdatePenalty />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/action/:id"
+          element={
+            <ProtectedRoute>
+              <Action />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

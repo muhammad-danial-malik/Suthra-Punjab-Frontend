@@ -116,7 +116,7 @@ function Penalties() {
   );
 
   const imposedByOptions = Array.from(
-    new Set(penaltiesData.map((p) => p.createdBy?.fullName))
+    new Set(penaltiesData.map((p) => p.createdBy?.fullName).filter(Boolean))
   );
 
   const statusOptions = Array.from(new Set(penaltiesData.map((p) => p.status)));
@@ -125,9 +125,7 @@ function Penalties() {
   const filteredPenalties = penaltiesData.filter((penalty) => {
     const lowerSearch = searchTerm.toLowerCase();
 
-    let penaltyDateObj = penalty.penaltyDate
-      ? new Date(penalty.penaltyDate)
-      : null;
+    let penaltyDateObj = penalty?.penaltyDate ? new Date(penalty.penaltyDate) : null;
     const fromDateObj = dateFrom ? new Date(dateFrom) : null;
     const toDateObj = dateTo ? new Date(dateTo) : null;
 
@@ -769,22 +767,22 @@ function Penalties() {
                       )}
                       {columnVisibility.circle && (
                         <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">
-                          {penalty.circle.name}
+                          {penalty.circle?.name || "-"}
                         </td>
                       )}
                       {columnVisibility.penaltyType && (
                         <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">
-                          {penalty.penaltyType.name}
+                          {penalty.penaltyType?.name || "-"}
                         </td>
                       )}
                       {columnVisibility.penaltySubType && (
                         <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">
-                          {penalty.penaltyType.subtype}
+                          {penalty.penaltyType?.subtype || "-"}
                         </td>
                       )}
                       {columnVisibility.amount && (
                         <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">
-                          {penalty.penaltyType.amount}
+                          {penalty.penaltyType?.amount ?? "-"}
                         </td>
                       )}
                       {columnVisibility.status && (
@@ -810,12 +808,12 @@ function Penalties() {
                       )}
                       {columnVisibility.contractor && (
                         <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">
-                          {penalty.contractor.name}
+                          {penalty.contractor?.name || "-"}
                         </td>
                       )}
                       {columnVisibility.imposedBy && (
                         <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-600">
-                          {penalty.createdBy.fullName}
+                          {penalty.createdBy?.fullName || "-"}
                         </td>
                       )}
                       {columnVisibility.penaltyDate && (
