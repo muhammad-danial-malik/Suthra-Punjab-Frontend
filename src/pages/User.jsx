@@ -875,7 +875,11 @@ function User() {
                 )}
 
                 {/* Submit Button */}
-                <div className="flex justify-end mt-6">
+                <div className="flex justify-between items-center mt-6">
+                  <p className="text-sm text-gray-600">
+                    <span className="text-red-600 font-semibold">*</span> fields
+                    are compulsory
+                  </p>
                   <button
                     type="submit"
                     disabled={isLoading}
@@ -890,7 +894,7 @@ function User() {
         )}
         {showEditPopup && editingUser && (
           <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white w-[650px] rounded-2xl shadow-2xl p-8 relative animate-fadeIn">
+            <div className="bg-white w-[90%] max-w-[650px] rounded-2xl shadow-2xl p-8 relative animate-fadeIn max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => setShowEditPopup(false)}
                 className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors text-2xl"
@@ -900,7 +904,10 @@ function User() {
               <h2 className="text-xl font-semibold mb-5 border-b pb-2 text-gray-700">
                 Update User
               </h2>
-              <form onSubmit={handleUpdateSubmit} className="space-y-2">
+              <form
+                onSubmit={handleUpdateSubmit}
+                className="space-y-2 overflow-visible"
+              >
                 {/* Profile Picture Section */}
                 <div className="flex items-center gap-6 mb-4 pb-4 border-b">
                   <div className="flex-shrink-0">
@@ -1089,11 +1096,11 @@ function User() {
                   </div>
                 )}
                 {editingUser.role === "inspection" && (
-                  <div className="flex flex-col">
+                  <div className="flex flex-col z-50 relative">
                     <label className="text-sm font-medium text-gray-600 mb-1">
                       Inspection Circles *
                     </label>
-                    <div className="relative">
+                    <div className="relative z-50">
                       <button
                         type="button"
                         onClick={() =>
@@ -1117,7 +1124,7 @@ function User() {
                         <span className="text-xs text-gray-500 ml-2">▼</span>
                       </button>
                       {editingUser.showCirclesDropdown && (
-                        <div className="absolute z-50 mt-1 left-0 right-0 bg-white border rounded-md shadow-lg max-h-56 overflow-auto">
+                        <div className="absolute z-50 mt-1 left-0 right-0 bg-white border rounded-md shadow-xl max-h-56 overflow-auto top-full">
                           {circles.map((c) => {
                             const checked =
                               editingUser.assignedCircles.includes(c._id);

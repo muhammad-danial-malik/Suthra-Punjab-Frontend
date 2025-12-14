@@ -25,6 +25,15 @@ export default function Login() {
     try {
       const response = await loginForm({ username, password }).unwrap();
       console.log("Login successful:", response);
+
+      // Check if user role is admin
+      const userRole = response.data.user?.role;
+      if (userRole !== "admin") {
+        setError("Only admin can login. Access denied.");
+        return;
+      }
+
+      // Store tokens only for admin users
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("refreshToken", response.data.refreshToken);
       localStorage.setItem("user", JSON.stringify(response.data.user));
@@ -46,7 +55,13 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)' }}>
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        background:
+          "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+      }}
+    >
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Header / Logo */}
         <div className="px-6 py-6 bg-gradient-to-r from-green-600 to-green-700 flex items-center gap-3">
@@ -61,23 +76,29 @@ export default function Login() {
             <div className="text-xs text-green-100 mt-1">
               Penalty Management System
             </div>
-            <div className="text-xs text-green-100">
-              Government of Punjab
-            </div>
+            <div className="text-xs text-green-100">Government of Punjab</div>
           </div>
         </div>
 
         <form onSubmit={handleLogin} className="px-8 py-8">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Login to Your Account</h2>
-            <p className="text-sm text-gray-600 mt-2">Enter your credentials to access the portal</p>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Login to Your Account
+            </h2>
+            <p className="text-sm text-gray-600 mt-2">
+              Enter your credentials to access the portal
+            </p>
           </div>
 
           {/* Error area */}
           {error && (
             <div className="mb-4 bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded">
               <div className="flex items-center gap-2">
-                <AlertTriangle size={20} strokeWidth={2} className="text-red-600" />
+                <AlertTriangle
+                  size={20}
+                  strokeWidth={2}
+                  className="text-red-600"
+                />
                 <span>{error}</span>
               </div>
             </div>
@@ -121,12 +142,14 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3.5 rounded-lg text-white font-semibold cursor-pointer bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 ${loading ? 'opacity-70' : ''}`}
+              className={`w-full py-3.5 rounded-lg text-white font-semibold cursor-pointer bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 ${
+                loading ? "opacity-70" : ""
+              }`}
             >
               {loading && (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               )}
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? "Logging in..." : "Login"}
             </button>
           </div>
 
@@ -139,7 +162,8 @@ export default function Login() {
 
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 text-center">
           <p className="text-xs text-gray-600">
-            © {new Date().getFullYear()} <span className="font-semibold">Government of Punjab</span>
+            © {new Date().getFullYear()}{" "}
+            <span className="font-semibold">Government of Punjab</span>
           </p>
           <p className="text-xs text-gray-500 mt-1">
             Suthra Punjab - Penalty Management System

@@ -391,6 +391,11 @@ export const apiSlice = createApi({
       invalidatesTags: ["PenaltyType"],
     }),
 
+    //  Get current user profile
+    GetCurrentUser: builder.query({
+      query: () => "/users/me",
+    }),
+
     //  Logout
     Logout: builder.mutation({
       query: () => ({
@@ -412,6 +417,7 @@ export const apiSlice = createApi({
 export const {
   useLoginFormMutation,
   useLogoutMutation,
+  useGetCurrentUserQuery,
   useDeletePenaltyMutation,
   useUpdatePenaltyMutation,
   useReviewPenaltyMutation,
