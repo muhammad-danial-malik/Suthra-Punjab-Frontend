@@ -1,5 +1,5 @@
 import React from "react";
-import Card from "../components/Card";
+import Card from "../components/card";
 import { cardsData } from "../data/data";
 import { useNavigate } from "react-router-dom";
 import SideBar from "../components/sideBar";

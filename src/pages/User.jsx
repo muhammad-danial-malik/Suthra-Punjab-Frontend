@@ -18,7 +18,7 @@ import {
   X,
   ChevronRight,
 } from "lucide-react";
-import Topbar from "../components/Topbar";
+import Topbar from "../components/topbar";
 
 function User() {
   const navigate = useNavigate();

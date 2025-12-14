@@ -16,7 +16,7 @@ import Circle from "./pages/Circle";
 import Department from "./pages/Department";
 import Notifications from "./pages/Notifications";
 import HeapHistory from "./pages/HeapHistory";
-import PenaltyTypes from "./pages/penaltyTypes";
+import PenaltyTypes from "./pages/PenaltyTypes";
 import BillingReports from "./pages/BillingReports";
 import BillingTypes from "./pages/BillingTypes";
 import NotFound from "./pages/NotFound";
