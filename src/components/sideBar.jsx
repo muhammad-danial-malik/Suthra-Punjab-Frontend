@@ -128,7 +128,7 @@ const SideBar = () => {
           </div>
           <div className="text-white text-center">
             <h3 className="font-bold text-sm">Suthra Punjab</h3>
-            <p className="text-xs opacity-90">Management System</p>
+            <p className="text-xs opacity-90">Monitoring System</p>
           </div>
         </div>
       </div>

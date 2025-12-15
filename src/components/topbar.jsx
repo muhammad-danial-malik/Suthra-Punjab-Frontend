@@ -22,7 +22,7 @@ const Topbar = () => {
             className="flex items-center gap-2 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors"
           >
             <ChevronLeft size={18} strokeWidth={2.5} />
-            <span className="font-semibold text-base">MANAGEMENT SYSTEM</span>
+            <span className="font-semibold text-base">Monitoring System</span>
           </button>
           <span className="text-white/60 font-light">|</span>
           <span className="font-medium text-sm">Suthra Punjab</span>

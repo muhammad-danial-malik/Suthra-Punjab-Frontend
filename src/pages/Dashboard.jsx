@@ -47,10 +47,10 @@ const Dashboard = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-800 uppercase tracking-wide">
-                  LOCAL GOVERNMENT & COMMUNITY DEVELOPMENT DEPARTMENT
+                  Suthra Punjab Monitoring System
                 </h1>
                 <p className="text-xs text-gray-500">
-                  Government of Punjab, Pakistan
+                  SB Engineering JV
                 </p>
               </div>
             </div>
@@ -83,7 +83,7 @@ const Dashboard = () => {
           {/* Footer Info */}
           <div className="mt-12 text-center text-sm text-gray-500">
             <p>
-              © 2025 Local Government & Community Development Department, Punjab
+              © 2025 Developed by NUEX SOLUTIONS. All rights reserved.
             </p>
           </div>
         </div>
