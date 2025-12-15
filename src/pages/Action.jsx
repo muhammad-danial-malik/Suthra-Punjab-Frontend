@@ -87,9 +87,9 @@ function Action() {
                 <strong>Office:</strong> {penaltyData.departmentName}
               </p>
               <p>
-                <strong>Amount:</strong>{" "}
+                <strong>Score:</strong>{" "}
                 <span className="font-semibold text-green-700">
-                  Rs. {penaltyData.penaltyAmount}
+                  {penaltyData.penaltyType?.amount ?? "-"}
                 </span>
               </p>
               <p>
