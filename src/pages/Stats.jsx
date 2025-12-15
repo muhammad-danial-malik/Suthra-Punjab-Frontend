@@ -181,7 +181,7 @@ const Stats = () => {
       borderColor: "border-purple-200",
     },
     {
-      title: "Total Amount",
+      title: "Total Score",
       value: `Rs.${filteredStats.totalPenaltyAmount?.toLocaleString() || 0}`,
       icon: DollarSign,
       color: "text-indigo-600",
@@ -189,7 +189,7 @@ const Stats = () => {
       borderColor: "border-indigo-200",
     },
     {
-      title: "Avg Amount",
+      title: "Avg Score",
       value: `Rs.${filteredStats.avgPenaltyAmount?.toFixed(0) || 0}`,
       icon: Calculator,
       color: "text-pink-600",
