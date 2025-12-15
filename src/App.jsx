@@ -19,7 +19,7 @@ import HeapHistory from "./pages/HeapHistory";
 import PenaltyTypes from "./pages/PenaltyTypes";
 import BillingReports from "./pages/BillingReports";
 import BillingTypes from "./pages/BillingTypes";
-import NotFound from "./pages/NotFound";
+// import NotFound from "./pages/NotFound";
 function App() {
   return (
     <>
@@ -160,7 +160,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<NotFound />} />
+        {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </>
   );
