@@ -90,6 +90,7 @@ function Penalties() {
             (!selectedDepartment || p.departmentName === selectedDepartment)
         )
         .map((p) => p.circle?.name)
+        .filter(Boolean)
     )
   );
 
@@ -103,6 +104,7 @@ function Penalties() {
             (!selectedCircle || p.circle?.name === selectedCircle)
         )
         .map((p) => p.contractor?.name)
+        .filter(Boolean)
     )
   );
 
@@ -746,7 +748,8 @@ function Penalties() {
                   {filteredPenalties.map((penalty, index) => (
                     <tr
                       key={penalty._id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => handleRowClick(penalty)}
                     >
                       <td className="px-3 py-2.5 whitespace-nowrap text-sm text-gray-900">
                         {index + 1}
@@ -874,19 +877,19 @@ function Penalties() {
                       </p>
                       <p>
                         <strong>Type:</strong>{" "}
-                        {selectedPenalty.penaltyType.name}
+                        {selectedPenalty.penaltyType?.name || "-"}
                       </p>
                       <p>
                         <strong>Sub Type:</strong>{" "}
-                        {selectedPenalty.penaltyType.subtype}
+                        {selectedPenalty.penaltyType?.subtype || "-"}
                       </p>
                       <p>
-                        <strong>Amount:</strong> Rs.{" "}
-                        {selectedPenalty.penaltyAmount}
+                        <strong>Score:</strong>{" "}
+                        {selectedPenalty.penaltyType?.amount ?? "-"}
                       </p>
                       <p>
                         <strong>Date:</strong>{" "}
-                        {formatDateForDisplay(selectedPenalty.deadline)}
+                        {formatDateForDisplay(selectedPenalty?.deadline)}
                       </p>
                       <p>
                         <strong>Status:</strong> {selectedPenalty.status}
@@ -894,11 +897,11 @@ function Penalties() {
 
                       <p>
                         <strong>Supervisor:</strong>{" "}
-                        {selectedPenalty.contractor.name}
+                        {selectedPenalty.contractor?.name || "-"}
                       </p>
                       <p>
                         <strong>Added By:</strong>{" "}
-                        {selectedPenalty.createdBy.fullName}
+                        {selectedPenalty.createdBy?.fullName || "-"}
                       </p>
                     </div>
 
