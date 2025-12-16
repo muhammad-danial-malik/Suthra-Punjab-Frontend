@@ -45,13 +45,17 @@ const Stats = () => {
   // State for selected circle
   const [selectedCircle, setSelectedCircle] = useState(null);
 
+  // State for date range filter
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+
   console.log("stat", data);
   console.log("CircleData", CircleData);
   console.log("PenaltiesData", PenaltiesData);
 
   // Generate dynamic circle data with real penalty counts
   const circleData = useMemo(() => {
-    return CircleData.map((circle, index) => {
+    return CircleData.map((circle) => {
       const totalPenalties = PenaltiesData.filter(
         (penalty) => penalty.circle && penalty.circle._id === circle._id
       ).length;
@@ -79,13 +83,28 @@ const Stats = () => {
       );
     }
 
+    // Apply date range filter
+    if (dateFrom || dateTo) {
+      relevantPenalties = relevantPenalties.filter((penalty) => {
+        const penaltyDate = penalty.createdAt
+          ? new Date(penalty.createdAt)
+          : null;
+        if (!penaltyDate) return false;
+
+        const fromDateObj = dateFrom ? new Date(dateFrom) : null;
+        const toDateObj = dateTo ? new Date(dateTo) : null;
+
+        const isAfterFrom = !fromDateObj || penaltyDate >= fromDateObj;
+        const isBeforeTo = !toDateObj || penaltyDate <= toDateObj;
+
+        return isAfterFrom && isBeforeTo;
+      });
+    }
+
     // Calculate stats from filtered penalties
     const total = relevantPenalties.length;
     const newPenalties = relevantPenalties.filter(
       (p) => p.status.toLowerCase() === "new"
-    ).length;
-    const pending = relevantPenalties.filter(
-      (p) => p.status.toLowerCase() === "pending"
     ).length;
     const overdue = relevantPenalties.filter(
       (p) => p.status.toLowerCase() === "overdue"
@@ -101,7 +120,7 @@ const Stats = () => {
     ).length;
 
     const totalAmount = relevantPenalties.reduce(
-      (sum, penalty) => sum + (penalty.penaltyAmount || 0),
+      (sum, penalty) => sum + (penalty.penaltyType?.amount || 0),
       0
     );
     const avgAmount = total > 0 ? totalAmount / total : 0;
@@ -111,7 +130,6 @@ const Stats = () => {
     return {
       total,
       new: newPenalties,
-      pending,
       overdue,
       resolved,
       approved,
@@ -120,7 +138,7 @@ const Stats = () => {
       avgPenaltyAmount: avgAmount,
       resolutionRate,
     };
-  }, [PenaltiesData, selectedCircle]);
+  }, [PenaltiesData, selectedCircle, dateFrom, dateTo]);
 
   // Generate dynamic colors for circles
   const CIRCLE_COLORS = useMemo(() => {
@@ -148,6 +166,13 @@ const Stats = () => {
   const handleShowAll = () => {
     setSelectedCircle(null);
   };
+
+  // Reset date filters
+  const handleResetFilters = () => {
+    setDateFrom("");
+    setDateTo("");
+    setSelectedCircle(null);
+  };
   const stats = [
     {
       title: "Total Penalties",
@@ -164,14 +189,6 @@ const Stats = () => {
       color: "text-green-600",
       bgColor: "bg-green-50",
       borderColor: "border-green-200",
-    },
-    {
-      title: "Pending Penalties",
-      value: filteredStats.pending || 0,
-      icon: Clock,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
-      borderColor: "border-yellow-200",
     },
     {
       title: "Overdue Penalties",
@@ -215,7 +232,7 @@ const Stats = () => {
     },
     {
       title: "Total Score",
-      value: `${filteredStats.totalPenaltyAmount?.toLocaleString() || 0}`,
+      value: `${(filteredStats.totalPenaltyAmount ?? 0).toLocaleString()}`,
       icon: DollarSign,
       color: "text-indigo-600",
       bgColor: "bg-indigo-50",
@@ -223,7 +240,7 @@ const Stats = () => {
     },
     {
       title: "Avg Score",
-      value: `${filteredStats.avgPenaltyAmount?.toFixed(0) || 0}`,
+      value: `${Math.round(filteredStats.avgPenaltyAmount ?? 0)}`,
       icon: Calculator,
       color: "text-pink-600",
       bgColor: "bg-pink-50",
@@ -233,7 +250,6 @@ const Stats = () => {
 
   const barData = [
     { name: "New", value: filteredStats.new || 0, color: "#10B981" },
-    { name: "Pending", value: filteredStats.pending || 0, color: "#F59E0B" },
     { name: "Overdue", value: filteredStats.overdue || 0, color: "#EF4444" },
     { name: "Resolved", value: filteredStats.resolved || 0, color: "#06B6D4" },
     { name: "Approved", value: filteredStats.approved || 0, color: "#8B5CF6" },
@@ -242,7 +258,6 @@ const Stats = () => {
 
   const pieData = [
     { name: "New", value: filteredStats.new || 0 },
-    { name: "Pending", value: filteredStats.pending || 0 },
     { name: "Overdue", value: filteredStats.overdue || 0 },
     { name: "Resolved", value: filteredStats.resolved || 0 },
     { name: "Approved", value: filteredStats.approved || 0 },
@@ -324,6 +339,56 @@ const Stats = () => {
             )}
           </div>
         </div>
+
+        {/* Date Range Filter Section */}
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Date Range Filter
+              </h2>
+              <div className="flex gap-3 items-center">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    From
+                  </label>
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    To
+                  </label>
+                  <input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={handleResetFilters}
+              className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2"
+            >
+              Reset All Filters
+            </button>
+          </div>
+          {(dateFrom || dateTo) && (
+            <div className="mt-4 text-sm text-gray-600">
+              Showing penalties{" "}
+              {dateFrom && `from ${new Date(dateFrom).toLocaleDateString()}`}
+              {dateFrom && dateTo && " "}
+              {dateTo && `to ${new Date(dateTo).toLocaleDateString()}`}
+            </div>
+          )}
+        </div>
+
         {/* Circle Stats Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 mb-8">
           <div className="flex items-center mb-6">

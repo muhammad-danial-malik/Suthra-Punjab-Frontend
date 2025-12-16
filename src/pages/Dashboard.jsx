@@ -49,9 +49,7 @@ const Dashboard = () => {
                 <h1 className="text-xl font-bold text-gray-800 uppercase tracking-wide">
                   Suthra Punjab Monitoring System
                 </h1>
-                <p className="text-xs text-gray-500">
-                  SB Engineering JV
-                </p>
+                <p className="text-xs text-gray-500">SB Engineering JV</p>
               </div>
             </div>
           </div>
@@ -83,7 +81,11 @@ const Dashboard = () => {
           {/* Footer Info */}
           <div className="mt-12 text-center text-sm text-gray-500">
             <p>
-              © 2025 Developed by NUEX SOLUTIONS. All rights reserved.
+              © {new Date().getFullYear()}{" "}
+              <span className="font-semibold">
+                Developed by NUEX SOLUTIONS.
+              </span>{" "}
+              All rights reserved.
             </p>
           </div>
         </div>

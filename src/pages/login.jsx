@@ -74,9 +74,9 @@ export default function Login() {
               Suthra Punjab
             </div>
             <div className="text-xs text-green-100 mt-1">
-              Penalty Management System
+              Monitoring System
             </div>
-            <div className="text-xs text-green-100">Government of Punjab</div>
+            <div className="text-xs text-green-100">SB Engineering JV</div>
           </div>
         </div>
 
@@ -163,10 +163,10 @@ export default function Login() {
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 text-center">
           <p className="text-xs text-gray-600">
             © {new Date().getFullYear()}{" "}
-            <span className="font-semibold">Government of Punjab</span>
+            <span className="font-semibold">Developed by NUEX SOLUTIONS</span>
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Suthra Punjab - Penalty Management System
+            Suthra Punjab - Monitoring System
           </p>
         </div>
       </div>

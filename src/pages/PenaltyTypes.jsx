@@ -50,7 +50,7 @@ function PenaltyTypes() {
   const [columnVisibility, setColumnVisibility] = useState({
     name: true,
     subtype: true,
-    amount: true,
+    score: true,
     status: true,
     resolutionTime: true,
     createdAt: true,
@@ -416,10 +416,10 @@ function PenaltyTypes() {
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-900">
-                  Average Amount
+                  Average Score
                 </p>
                 <p className="text-lg font-semibold text-purple-600">
-                  {formatCurrency(stats.averageAmount)}
+                  {stats.averageAmount.toFixed(0)}
                 </p>
               </div>
             </div>
@@ -434,10 +434,10 @@ function PenaltyTypes() {
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-900">
-                  Highest Amount
+                  Highest Score
                 </p>
                 <p className="text-lg font-semibold text-orange-600">
-                  {formatCurrency(stats.highestAmount)}
+                  {stats.highestAmount}
                 </p>
               </div>
             </div>
@@ -481,7 +481,6 @@ function PenaltyTypes() {
                 <option value="small">Small</option>
                 <option value="medium">Medium</option>
                 <option value="large">Large</option>
-                <option value="none">None</option>
               </select>
 
               {/* Status Filter */}
@@ -591,9 +590,9 @@ function PenaltyTypes() {
                         Sub-Types
                       </th>
                     )}
-                    {columnVisibility.amount && (
+                    {columnVisibility.score && (
                       <th className="px-3 py-2 text-left text-xs font-medium text-white uppercase tracking-wider">
-                        Amount
+                        Score
                       </th>
                     )}
                     {columnVisibility.status && (
@@ -649,10 +648,10 @@ function PenaltyTypes() {
                           </span>
                         </td>
                       )}
-                      {columnVisibility.amount && (
+                      {columnVisibility.score && (
                         <td className="px-3 py-2.5 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
-                            {formatCurrency(penaltyType.amount)}
+                            {penaltyType.amount}
                           </div>
                         </td>
                       )}
@@ -796,17 +795,15 @@ function PenaltyTypes() {
                   {/* Penalty Amount */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Penalty Amount (PKR){" "}
-                      <span className="text-red-500">*</span>
+                      Penalty Score <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
                       name="amount"
                       value={formData.amount}
                       onChange={handleInputChange}
-                      placeholder="15000"
+                      placeholder="100"
                       min="0"
-                      step="100"
                       className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 ${
                         errors.amount
                           ? "border-red-300 bg-red-50"
@@ -1024,9 +1021,9 @@ function PenaltyTypes() {
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-600">Amount</p>
+                    <p className="text-sm text-gray-600">Score</p>
                     <p className="text-lg font-bold text-green-600 mt-1">
-                      {formatCurrency(penaltyTypeDetails.amount || 0)}
+                      {penaltyTypeDetails.amount || 0}
                     </p>
                   </div>
 

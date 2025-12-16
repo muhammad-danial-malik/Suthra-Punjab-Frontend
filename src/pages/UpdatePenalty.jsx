@@ -10,19 +10,9 @@ function UpdatePenalty() {
   const [reviewPenalty] = useUpdatePenaltyMutation();
 
   const [formData, setFormData] = useState({
-    penaltyId: "",
-    DepartmentName: "",
-    circle: "",
-    penaltyType: "",
-    penaltySubType: "",
-    penaltyDate: "",
-    // status: "",
-    // penaltySource: "",
-    contractor: "",
-    // tel: "",
-    // addedBy: "",
-    // department: "",
-    imposedBy: "",
+    description: "",
+    area: "",
+    address: "",
   });
 
   // Load penalty data when ready
@@ -31,19 +21,9 @@ function UpdatePenalty() {
       const found = penaltiesData.data.find((p) => p._id === id);
       if (found) {
         setFormData({
-          penaltyId: found.penaltyId || "",
-          departmentName: found.departmentName || "",
-          circle: found.circle.name || "",
-          penaltyType: found.penaltyType.name || "",
-          penaltySubType: found.penaltyType.subtype || "",
-          penaltyDate: found.createdAt?.split("T")[0] || "",
-          //   status: found.status || "",
-          //   penaltySource: found.penaltySource || "",
-          contractor: found.contractor.name || "",
-          //   tel: found.tel || "",
-          //   addedBy: found.addedBy || "",
-          //   department: found.department || "",
-          imposedBy: found.createdBy.fullName || "",
+          description: found.description || "",
+          area: found.area || "",
+          address: found.location?.address || "",
         });
       }
     }
@@ -88,23 +68,50 @@ function UpdatePenalty() {
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Object.keys(formData).map((key) => (
-                <div key={key}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {key.replace(/([A-Z])/g, " $1")}
-                  </label>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  rows="4"
+                  placeholder="Enter penalty description"
+                />
+              </div>
 
-                  <input
-                    type={key === "penaltyDate" ? "date" : "text"}
-                    name={key}
-                    value={formData[key]}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border rounded-md"
-                    readOnly={key === "addedBy" || key === "penaltyId"}
-                  />
-                </div>
-              ))}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Area
+                </label>
+                <select
+                  name="area"
+                  value={formData.area}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="">Select Area</option>
+                  <option value="Urban">Urban</option>
+                  <option value="Rural">Rural</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Enter address"
+                />
+              </div>
             </div>
 
             <div className="flex justify-end gap-4 mt-8">
