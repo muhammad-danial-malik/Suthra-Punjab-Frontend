@@ -19,6 +19,7 @@ import HeapHistory from "./pages/HeapHistory";
 import PenaltyTypes from "./pages/PenaltyTypes";
 import BillingReports from "./pages/BillingReports";
 import BillingTypes from "./pages/BillingTypes";
+import Scoreboard from "./pages/Scoreboard";
 // import NotFound from "./pages/NotFound";
 function App() {
   return (
@@ -141,6 +142,14 @@ function App() {
           element={
             <ProtectedRoute>
               <BillingTypes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/scoreboard"
+          element={
+            <ProtectedRoute>
+              <Scoreboard />
             </ProtectedRoute>
           }
         />

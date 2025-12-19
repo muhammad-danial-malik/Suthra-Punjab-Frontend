@@ -31,6 +31,7 @@ import {
   Calculator,
   BarChart3,
   PieChart as PieChartIcon,
+  Tags,
 } from "lucide-react";
 
 const Stats = () => {
@@ -173,6 +174,71 @@ const Stats = () => {
     setDateTo("");
     setSelectedCircle(null);
   };
+
+  // Filter penalty types by circle from backend data
+  const filteredPenaltyTypesByCircle = useMemo(() => {
+    if (!data?.penaltyTypesByCircle) return [];
+
+    if (selectedCircle) {
+      return data.penaltyTypesByCircle.filter(
+        (circle) => circle._id === selectedCircle.circleId
+      );
+    }
+
+    return data.penaltyTypesByCircle;
+  }, [data, selectedCircle]);
+
+  // Generate penalty type distribution data with percentages
+  const penaltyTypeDistribution = useMemo(() => {
+    let relevantPenalties = PenaltiesData;
+
+    if (selectedCircle) {
+      relevantPenalties = PenaltiesData.filter(
+        (penalty) =>
+          penalty.circle && penalty.circle._id === selectedCircle.circleId
+      );
+    }
+
+    // Apply date range filter
+    if (dateFrom || dateTo) {
+      relevantPenalties = relevantPenalties.filter((penalty) => {
+        const penaltyDate = penalty.createdAt
+          ? new Date(penalty.createdAt)
+          : null;
+        if (!penaltyDate) return false;
+        const fromDateObj = dateFrom ? new Date(dateFrom) : null;
+        const toDateObj = dateTo ? new Date(dateTo) : null;
+        return (
+          (!fromDateObj || penaltyDate >= fromDateObj) &&
+          (!toDateObj || penaltyDate <= toDateObj)
+        );
+      });
+    }
+
+    // Group by penalty type
+    const typeMap = {};
+    relevantPenalties.forEach((penalty) => {
+      const typeName = penalty.penaltyType?.name || "Unknown";
+      const typeScore = penalty.penaltyType?.amount || 0;
+
+      if (!typeMap[typeName]) {
+        typeMap[typeName] = { count: 0, totalScore: 0 };
+      }
+      typeMap[typeName].count++;
+      typeMap[typeName].totalScore += typeScore;
+    });
+
+    const total = relevantPenalties.length;
+    return Object.entries(typeMap)
+      .map(([name, data]) => ({
+        name,
+        count: data.count,
+        totalScore: data.totalScore,
+        percentage: total > 0 ? ((data.count / total) * 100).toFixed(1) : 0,
+      }))
+      .sort((a, b) => b.totalScore - a.totalScore);
+  }, [PenaltiesData, selectedCircle, dateFrom, dateTo]);
+
   const stats = [
     {
       title: "Total Penalties",
@@ -599,9 +665,9 @@ const Stats = () => {
           })}
         </div>
 
-        {/* Charts Section */}
+        {/* Status Distribution Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Bar Chart */}
+          {/* Bar Chart - Status */}
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
             <div className="flex items-center mb-6">
               <BarChart3 className="h-6 w-6 text-blue-600 mr-3" />
@@ -629,7 +695,7 @@ const Stats = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Pie Chart */}
+          {/* Pie Chart - Status */}
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
             <div className="flex items-center mb-6">
               <PieChartIcon className="h-6 w-6 text-blue-600 mr-3" />
@@ -665,6 +731,245 @@ const Stats = () => {
             </ResponsiveContainer>
           </div>
         </div>
+
+        {/* Penalty Types by Circle Section */}
+        {filteredPenaltyTypesByCircle &&
+          filteredPenaltyTypesByCircle.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 mb-8">
+              <div className="flex items-center mb-6">
+                <Tags className="h-6 w-6 text-purple-600 mr-3" />
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Penalty Types by Circle - Score Weightage
+                  {selectedCircle && (
+                    <span className="ml-2 text-sm font-normal text-gray-600">
+                      (Filtered: {selectedCircle.name})
+                    </span>
+                  )}
+                </h2>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Circle
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Total Penalties
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Total Score
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Penalty Types Breakdown
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredPenaltyTypesByCircle.map((circle, idx) => (
+                      <tr key={circle._id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {circle.circleName}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {circle.totalPenalties}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-semibold text-purple-600">
+                            {circle.totalScore.toLocaleString()}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-wrap gap-2">
+                            {circle.penaltyTypes.map((type, typeIdx) => (
+                              <div
+                                key={typeIdx}
+                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200"
+                                title={`${type.name}: ${
+                                  type.count
+                                } penalties, Avg Score: ${type.avgScore.toFixed(
+                                  0
+                                )}`}
+                              >
+                                <span className="font-semibold">
+                                  {type.name}
+                                </span>
+                                <span className="mx-1">•</span>
+                                <span>{type.count}x</span>
+                                <span className="mx-1">•</span>
+                                <span className="font-semibold">
+                                  {type.totalScore.toLocaleString()}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
+                <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                  <p className="text-sm font-medium text-purple-900">
+                    Highest Score Circle
+                  </p>
+                  <p className="text-2xl font-bold text-purple-700 mt-1">
+                    {filteredPenaltyTypesByCircle[0]?.circleName}
+                  </p>
+                  <p className="text-xs text-purple-600 mt-1">
+                    Score:{" "}
+                    {filteredPenaltyTypesByCircle[0]?.totalScore.toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <p className="text-sm font-medium text-blue-900">
+                    Total Circles with Penalties
+                  </p>
+                  <p className="text-2xl font-bold text-blue-700 mt-1">
+                    {filteredPenaltyTypesByCircle.length}
+                  </p>
+                </div>
+
+                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                  <p className="text-sm font-medium text-green-900">
+                    Avg Score per Circle
+                  </p>
+                  <p className="text-2xl font-bold text-green-700 mt-1">
+                    {(
+                      filteredPenaltyTypesByCircle.reduce(
+                        (sum, c) => sum + c.totalScore,
+                        0
+                      ) / filteredPenaltyTypesByCircle.length
+                    ).toFixed(0)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+        {/* Penalty Type Distribution Charts Section */}
+        {penaltyTypeDistribution && penaltyTypeDistribution.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Bar Chart - Penalty Types */}
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+              <div className="flex items-center mb-6">
+                <BarChart3 className="h-6 w-6 text-purple-600 mr-3" />
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Penalty Types Count
+                </h2>
+              </div>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart
+                  data={penaltyTypeDistribution}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+                  <XAxis
+                    dataKey="name"
+                    stroke="#6B7280"
+                    fontSize={12}
+                    tickLine={false}
+                  />
+                  <YAxis stroke="#6B7280" fontSize={12} tickLine={false} />
+                  <Tooltip
+                    content={({ payload }) => {
+                      if (payload && payload[0]) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                            <p className="font-semibold text-gray-900">
+                              {data.name}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Count: {data.count}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Score: {data.totalScore.toLocaleString()}
+                            </p>
+                            <p className="text-sm font-semibold text-purple-600">
+                              {data.percentage}%
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Legend />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]} fill="#9333EA" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Pie Chart - Penalty Types */}
+            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+              <div className="flex items-center mb-6">
+                <PieChartIcon className="h-6 w-6 text-purple-600 mr-3" />
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Penalty Types Distribution
+                </h2>
+              </div>
+              <ResponsiveContainer width="100%" height={350}>
+                <PieChart>
+                  <Pie
+                    data={penaltyTypeDistribution}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percentage }) =>
+                      percentage > 0 ? `${name} ${percentage}%` : ""
+                    }
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="count"
+                    stroke="#ffffff"
+                    strokeWidth={2}
+                  >
+                    {penaltyTypeDistribution.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    content={({ payload }) => {
+                      if (payload && payload[0]) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                            <p className="font-semibold text-gray-900">
+                              {data.name}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Count: {data.count}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Score: {data.totalScore.toLocaleString()}
+                            </p>
+                            <p className="text-sm font-semibold text-purple-600">
+                              {data.percentage}%
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

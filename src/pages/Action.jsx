@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ImageModal from "../components/ImageModal";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetpenaltiesQuery, useReviewPenaltyMutation } from "@/api/apiSlice";
 
@@ -8,6 +9,7 @@ function Action() {
   const [remarks, setRemarks] = useState("");
   const [actionStatus, setActionStatus] = useState(null);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const { data } = useGetpenaltiesQuery();
   const penalties = data?.data || [];
@@ -177,8 +179,11 @@ function Action() {
                   {penaltyData.inspectionImages ? (
                     <img
                       src={penaltyData.inspectionImages[0]?.url}
-                      alt="image"
-                      className="object-contain  max-w-36 h-32 "
+                      alt="Before"
+                      className="object-contain max-w-36 h-32 cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() =>
+                        setSelectedImage(penaltyData.inspectionImages[0]?.url)
+                      }
                     />
                   ) : (
                     <p className="text-gray-500">No image available</p>
@@ -195,7 +200,10 @@ function Action() {
                     <img
                       src={penaltyData.resolutionImages[0]?.url}
                       alt="After"
-                      className="object-contain  max-w-36 h-32"
+                      className="object-contain max-w-36 h-32 cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() =>
+                        setSelectedImage(penaltyData.resolutionImages[0]?.url)
+                      }
                     />
                   ) : (
                     <p className="text-gray-500">No image available</p>
@@ -257,6 +265,14 @@ function Action() {
           )}
         </div>
       </div>
+      {/* Image Modal */}
+      {selectedImage && (
+        <ImageModal
+          src={selectedImage}
+          alt="Penalty Image"
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
     </div>
   );
 }

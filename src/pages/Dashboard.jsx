@@ -3,7 +3,7 @@ import Card from "../components/card";
 import { cardsData } from "../data/data";
 import { useNavigate } from "react-router-dom";
 import SideBar from "../components/sideBar";
-import { Building2, Bell, RefreshCw } from "lucide-react";
+import { Building2, Bell, RefreshCw, Trophy } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -51,6 +51,15 @@ const Dashboard = () => {
                 </h1>
                 <p className="text-xs text-gray-500">SB Engineering JV</p>
               </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate("/scoreboard")}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors shadow"
+              >
+                <Trophy size={16} />
+                Scoreboard
+              </button>
             </div>
           </div>
         </div>

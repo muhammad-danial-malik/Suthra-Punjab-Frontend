@@ -396,6 +396,27 @@ export const apiSlice = createApi({
       query: () => "/users/me",
     }),
 
+    //  User Scoreboard (Admin)
+    GetUserScoreboard: builder.query({
+      query: ({
+        role = "all",
+        startDate,
+        endDate,
+        circleId,
+        page = 1,
+        limit = 10,
+      } = {}) => {
+        const params = new URLSearchParams();
+        if (role) params.append("role", role);
+        if (startDate) params.append("startDate", startDate);
+        if (endDate) params.append("endDate", endDate);
+        if (circleId) params.append("circleId", circleId);
+        params.append("page", page);
+        params.append("limit", limit);
+        return `/users/scoreboard/all?${params.toString()}`;
+      },
+    }),
+
     //  Logout
     Logout: builder.mutation({
       query: () => ({
@@ -418,6 +439,7 @@ export const {
   useLoginFormMutation,
   useLogoutMutation,
   useGetCurrentUserQuery,
+  useGetUserScoreboardQuery,
   useDeletePenaltyMutation,
   useUpdatePenaltyMutation,
   useReviewPenaltyMutation,
