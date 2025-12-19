@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Topbar from "../components/topbar";
+import ImageModal from "../components/ImageModal";
 import { useGetpenaltiesQuery, useDeletePenaltyMutation } from "@/api/apiSlice";
 import { Tags, Settings, Download, ChevronRight } from "lucide-react";
 
@@ -44,6 +45,7 @@ function Penalties() {
   const [selectedPenalty, setSelectedPenalty] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [showActions, setShowActions] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
   const [columnVisibility, setColumnVisibility] = useState({
     penaltyId: true,
@@ -909,16 +911,26 @@ function Penalties() {
                       <div>
                         <img
                           src={selectedPenalty.inspectionImages?.[0]?.url}
-                          alt=""
-                          className="w-32"
+                          alt="Before"
+                          className="w-32 cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() =>
+                            setSelectedImage(
+                              selectedPenalty.inspectionImages?.[0]?.url
+                            )
+                          }
                         />
                         <p>Before</p>
                       </div>
                       <div>
                         <img
                           src={selectedPenalty.inspectionImages?.[1]?.url}
-                          alt=""
-                          className="w-32"
+                          alt="After"
+                          className="w-32 cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() =>
+                            setSelectedImage(
+                              selectedPenalty.inspectionImages?.[1]?.url
+                            )
+                          }
                         />
                         <p>After</p>
                       </div>
@@ -965,6 +977,15 @@ function Penalties() {
           </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <ImageModal
+          src={selectedImage}
+          alt="Penalty Image"
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
     </div>
   );
 }
