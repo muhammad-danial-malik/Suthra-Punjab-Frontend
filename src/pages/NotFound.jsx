@@ -34,7 +34,7 @@ const NotFound = () => {
         {/* Back to Home Button */}
         <button
           onClick={() => navigate("/")}
-          className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:scale-105"
+          className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:scale-105 cursor-pointer"
         >
           <Home size={20} />
           <span>Back to Home</span>

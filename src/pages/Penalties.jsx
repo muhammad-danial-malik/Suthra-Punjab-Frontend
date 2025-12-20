@@ -239,7 +239,7 @@ function Penalties() {
             <h1 className="text-xl font-bold text-gray-700">PENALTIES</h1>
             <button
               onClick={() => navigate("/penalty-types")}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
             >
               <Tags className="w-5 h-5" />
               Penalty Types
@@ -953,13 +953,13 @@ function Penalties() {
                   <div className="p-4 flex gap-2 flex-col">
                     <button
                       onClick={() => navigate(`/action/${selectedPenalty._id}`)}
-                      className="block w-full text-center px-2 py-2 text-white  bg-blue-600 rounded-xl to-current"
+                      className="block w-full text-center px-2 py-2 text-white  bg-blue-600 rounded-xl to-current cursor-pointer"
                     >
                       Action
                     </button>
                     <button
                       onClick={() => navigate(`/update/${selectedPenalty._id}`)}
-                      className="block w-full text-center px-2 py-2 hover:text-white hover:bg-blue-600 rounded-xl  text-blue-600 to-current"
+                      className="block w-full text-center px-2 py-2 hover:text-white hover:bg-blue-600 rounded-xl  text-blue-600 to-current cursor-pointer"
                     >
                       Update
                     </button>

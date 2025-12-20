@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Topbar from "../components/topbar";
 import {
   useGetAllCirclesQuery,
@@ -15,9 +16,12 @@ import {
   BadgeCheck,
   Clock3,
   Layers,
+  BarChart3,
+  ChevronRight,
 } from "lucide-react";
 
 const Scoreboard = () => {
+  const navigate = useNavigate();
   const [role, setRole] = useState("all");
   const [circleId, setCircleId] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -80,8 +84,18 @@ const Scoreboard = () => {
                 Performance of inspectors and circle owners
               </p>
             </div>
-            <div className="text-sm text-gray-500">
-              {isFetching ? "Refreshing..." : null}
+            <div className="flex items-center gap-3">
+              {isFetching && (
+                <span className="text-sm text-gray-500">Refreshing...</span>
+              )}
+              <button
+                onClick={() => navigate("/stats")}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
+              >
+                <BarChart3 className="w-5 h-5" />
+                Statistics
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>

@@ -55,7 +55,7 @@ function UpdatePenalty() {
       <div className="bg-green-600 py-4 px-8 text-white flex justify-between items-center">
         <button
           onClick={() => navigate("/Penalties")}
-          className="hover:text-gray-200"
+          className="hover:text-gray-200 cursor-pointer"
         >
           ← Back to Penalties
         </button>
@@ -118,7 +118,7 @@ function UpdatePenalty() {
               <button
                 type="button"
                 onClick={() => navigate("/Penalties")}
-                className="px-6 py-2 border rounded-md"
+                className="px-6 py-2 border rounded-md cursor-pointer"
               >
                 Cancel
               </button>

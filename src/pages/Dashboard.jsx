@@ -55,7 +55,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => navigate("/scoreboard")}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors shadow"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition-colors shadow cursor-pointer"
               >
                 <Trophy size={16} />
                 Scoreboard

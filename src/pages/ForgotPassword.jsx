@@ -62,7 +62,7 @@ export default function ForgotPassword() {
             type="submit"
             disabled={loading}
             onClick={() => navigate("/reset-password")}
-            className={`w-full py-2 rounded-lg text-white font-medium bg-gradient-to-r from-[#16a34a] to-[#22c55e]`}
+            className={`w-full py-2 rounded-lg text-white font-medium bg-gradient-to-r from-[#16a34a] to-[#22c55e] cursor-pointer`}
           >
             Send Reset Link
           </button>

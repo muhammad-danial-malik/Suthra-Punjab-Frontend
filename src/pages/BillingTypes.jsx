@@ -369,7 +369,7 @@ function Billing() {
             <div className="flex gap-3">
               <button
                 onClick={() => navigate("/billing-reports")}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
               >
                 <FileText className="w-4 h-4" />
                 View Billing

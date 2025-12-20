@@ -54,7 +54,7 @@ function Action() {
           <p className="text-gray-600 text-xl mb-4">Penalty not found</p>
           <button
             onClick={() => navigate("/Penalties")}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer"
           >
             Back to Penalties
           </button>
@@ -99,7 +99,7 @@ function Action() {
           </p>
           <button
             onClick={() => navigate("/Penalties")}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer"
           >
             Back to Penalties
           </button>
@@ -114,7 +114,7 @@ function Action() {
       <div className="bg-green-600 text-white py-4 px-6 flex justify-between items-center">
         <button
           onClick={() => navigate("/Penalties")}
-          className="hover:text-gray-200"
+          className="hover:text-gray-200 cursor-pointer"
         >
           ← Back to Penalties
         </button>

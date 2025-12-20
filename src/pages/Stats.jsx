@@ -5,6 +5,7 @@ import {
   useGetcirclesQuery,
   useGetpenaltiesQuery,
 } from "../api/apiSlice";
+import { useNavigate } from "react-router-dom";
 import {
   BarChart,
   Bar,
@@ -32,6 +33,8 @@ import {
   BarChart3,
   PieChart as PieChartIcon,
   Tags,
+  Trophy,
+  ChevronRight,
 } from "lucide-react";
 
 const Stats = () => {
@@ -42,6 +45,7 @@ const Stats = () => {
   const data = statsData?.data;
   const CircleData = circlesData?.data || [];
   const PenaltiesData = penaltiesData?.data || [];
+  const navigate = useNavigate();
 
   // State for selected circle
   const [selectedCircle, setSelectedCircle] = useState(null);
@@ -394,15 +398,25 @@ const Stats = () => {
                   : "Comprehensive overview of penalty management metrics"}
               </p>
             </div>
-            {selectedCircle && (
+            <div className="flex items-center gap-3">
+              {selectedCircle && (
+                <button
+                  onClick={handleShowAll}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4" />
+                  Show All Penalties
+                </button>
+              )}
               <button
-                onClick={handleShowAll}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                onClick={() => navigate("/scoreboard")}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
               >
-                <FileText className="w-4 h-4" />
-                Show All Penalties
+                <Trophy className="w-5 h-5" />
+                Scoreboard
+                <ChevronRight className="w-4 h-4" />
               </button>
-            )}
+            </div>
           </div>
         </div>
 
