@@ -4,8 +4,24 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Topbar from "../components/topbar";
 import ImageModal from "../components/ImageModal";
-import { useGetpenaltiesQuery, useDeletePenaltyMutation } from "@/api/apiSlice";
-import { Tags, Settings, Download, ChevronRight } from "lucide-react";
+import {
+  useGetpenaltiesQuery,
+  useDeletePenaltyMutation,
+  useCreatePenaltyMutation,
+  useGetAllCirclesQuery,
+  useGetAllPenaltyTypesQuery,
+  useGetAllDepartmentsQuery,
+} from "@/api/apiSlice";
+import {
+  Tags,
+  Settings,
+  Download,
+  ChevronRight,
+  Plus,
+  X,
+  MapPin,
+  Upload,
+} from "lucide-react";
 
 function Penalties() {
   const [showOptions, setShowOptions] = useState(false);
@@ -47,6 +63,22 @@ function Penalties() {
   const [showActions, setShowActions] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
+
+  // Add Penalty Modal State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [penaltyForm, setPenaltyForm] = useState({
+    circle: "",
+    penaltyType: "",
+    departmentName: "",
+    description: "",
+    latitude: "",
+    longitude: "",
+    address: "",
+    area: "",
+    images: [],
+  });
+  const [imagePreview, setImagePreview] = useState([]);
+
   const [columnVisibility, setColumnVisibility] = useState({
     penaltyId: true,
     area: true,
@@ -64,9 +96,19 @@ function Penalties() {
   });
 
   const [deletePenalty] = useDeletePenaltyMutation();
+  const [createPenalty, { isLoading: isCreating }] = useCreatePenaltyMutation();
 
   const { data: penaltiesApiData } = useGetpenaltiesQuery();
   const penaltiesData = penaltiesApiData?.data || [];
+
+  const { data: circlesData } = useGetAllCirclesQuery();
+  const circles = circlesData?.data || [];
+
+  const { data: penaltyTypesData } = useGetAllPenaltyTypesQuery();
+  const penaltyTypes = penaltyTypesData?.data || [];
+
+  const { data: departmentsData } = useGetAllDepartmentsQuery();
+  const departments = departmentsData?.data || [];
   console.log("Fetched penalties:", penaltiesData);
 
   // Active filter view state
@@ -89,11 +131,11 @@ function Penalties() {
         .filter(
           (p) =>
             (!selectedArea || p.area === selectedArea) &&
-            (!selectedDepartment || p.departmentName === selectedDepartment)
+            (!selectedDepartment || p.departmentName === selectedDepartment),
         )
         .map((p) => p.circle?.name)
-        .filter(Boolean)
-    )
+        .filter(Boolean),
+    ),
   );
 
   const ContractorOptions = Array.from(
@@ -103,24 +145,24 @@ function Penalties() {
           (p) =>
             (!selectedArea || p.area === selectedArea) &&
             (!selectedDepartment || p.departmentName === selectedDepartment) &&
-            (!selectedCircle || p.circle?.name === selectedCircle)
+            (!selectedCircle || p.circle?.name === selectedCircle),
         )
         .map((p) => p.contractor?.name)
-        .filter(Boolean)
-    )
+        .filter(Boolean),
+    ),
   );
 
   const penaltyTypeOptions = Array.from(
-    new Set(penaltiesData.map((p) => p.penaltyType?.name).filter(Boolean))
+    new Set(penaltiesData.map((p) => p.penaltyType?.name).filter(Boolean)),
   );
 
   // Options for second dot filters
   const departmentOptions = Array.from(
-    new Set(penaltiesData.map((p) => p.departmentName).filter(Boolean))
+    new Set(penaltiesData.map((p) => p.departmentName).filter(Boolean)),
   );
 
   const imposedByOptions = Array.from(
-    new Set(penaltiesData.map((p) => p.createdBy?.fullName).filter(Boolean))
+    new Set(penaltiesData.map((p) => p.createdBy?.fullName).filter(Boolean)),
   );
 
   const statusOptions = Array.from(new Set(penaltiesData.map((p) => p.status)));
@@ -192,6 +234,119 @@ function Penalties() {
     }
   };
 
+  // Handle Add Penalty Form
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setPenaltyForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 1) {
+      alert("Only 1 image is allowed");
+      return;
+    }
+
+    if (files.length > 0) {
+      setPenaltyForm((prev) => ({
+        ...prev,
+        images: [files[0]], // Keep only the latest file
+      }));
+
+      // Create preview URL
+      const newPreview = URL.createObjectURL(files[0]);
+      setImagePreview([newPreview]);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setPenaltyForm((prev) => ({
+      ...prev,
+      images: [],
+    }));
+    setImagePreview([]);
+  };
+
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setPenaltyForm((prev) => ({
+            ...prev,
+            latitude: position.coords.latitude.toFixed(6),
+            longitude: position.coords.longitude.toFixed(6),
+          }));
+        },
+        (error) => {
+          alert("Unable to get location: " + error.message);
+        },
+      );
+    } else {
+      alert("Geolocation is not supported by this browser");
+    }
+  };
+
+  const handleSubmitPenalty = async (e) => {
+    e.preventDefault();
+
+    // Validation
+    if (
+      !penaltyForm.circle ||
+      !penaltyForm.penaltyType ||
+      !penaltyForm.departmentName ||
+      !penaltyForm.description
+    ) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    if (!penaltyForm.latitude || !penaltyForm.longitude) {
+      alert("Please provide location coordinates");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("circle", penaltyForm.circle);
+      formData.append("penaltyType", penaltyForm.penaltyType);
+      formData.append("departmentName", penaltyForm.departmentName);
+      formData.append("description", penaltyForm.description);
+      formData.append("latitude", penaltyForm.latitude);
+      formData.append("longitude", penaltyForm.longitude);
+      formData.append("address", penaltyForm.address);
+      formData.append("area", penaltyForm.area);
+
+      // Append images
+      penaltyForm.images.forEach((image) => {
+        formData.append("images", image);
+      });
+
+      await createPenalty(formData).unwrap();
+
+      // Reset form and close modal
+      setPenaltyForm({
+        circle: "",
+        penaltyType: "",
+        departmentName: "",
+        description: "",
+        latitude: "",
+        longitude: "",
+        address: "",
+        area: "",
+        images: [],
+      });
+      setImagePreview([]);
+      setShowAddModal(false);
+      alert("Penalty created successfully!");
+    } catch (error) {
+      console.error("Failed to create penalty:", error);
+      alert(error?.data?.message || "Failed to create penalty");
+    }
+  };
+
   // Show detail popup
   const handleRowClick = (penalty) => {
     setSelectedPenalty(penalty);
@@ -237,14 +392,23 @@ function Penalties() {
         <div className="bg-white p-6 rounded-md shadow">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-xl font-bold text-gray-700">PENALTIES</h1>
-            <button
-              onClick={() => navigate("/penalty-types")}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
-            >
-              <Tags className="w-5 h-5" />
-              Penalty Types
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
+              >
+                <Plus className="w-5 h-5" />
+                Add Penalty
+              </button>
+              <button
+                onClick={() => navigate("/penalty-types")}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors cursor-pointer"
+              >
+                <Tags className="w-5 h-5" />
+                Penalty Types
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Filter row - Conditional rendering based on activeFilterView */}
@@ -799,14 +963,14 @@ function Penalties() {
                               penalty.status === "new"
                                 ? "bg-blue-100 text-blue-800"
                                 : penalty.status === "overdue"
-                                ? "bg-red-100 text-red-800"
-                                : penalty.status === "resolved"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : penalty.status === "approved"
-                                ? "bg-emerald-100 text-emerald-800"
-                                : penalty.status === "rejected"
-                                ? "bg-purple-100 text-purple-800"
-                                : "bg-gray-100 text-gray-800"
+                                  ? "bg-red-100 text-red-800"
+                                  : penalty.status === "resolved"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : penalty.status === "approved"
+                                      ? "bg-emerald-100 text-emerald-800"
+                                      : penalty.status === "rejected"
+                                        ? "bg-purple-100 text-purple-800"
+                                        : "bg-gray-100 text-gray-800"
                             }`}
                           >
                             {penalty.status}
@@ -915,7 +1079,7 @@ function Penalties() {
                           className="w-32 cursor-pointer hover:opacity-80 transition-opacity"
                           onClick={() =>
                             setSelectedImage(
-                              selectedPenalty.inspectionImages?.[0]?.url
+                              selectedPenalty.inspectionImages?.[0]?.url,
                             )
                           }
                         />
@@ -928,7 +1092,7 @@ function Penalties() {
                           className="w-32 cursor-pointer hover:opacity-80 transition-opacity"
                           onClick={() =>
                             setSelectedImage(
-                              selectedPenalty.inspectionImages?.[1]?.url
+                              selectedPenalty.inspectionImages?.[1]?.url,
                             )
                           }
                         />
@@ -985,6 +1149,272 @@ function Penalties() {
           alt="Penalty Image"
           onClose={() => setSelectedImage(null)}
         />
+      )}
+
+      {/* Add Penalty Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-green-600 text-white px-6 py-4 flex items-center justify-between rounded-t-lg">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Plus className="w-6 h-6" />
+                Add New Penalty
+              </h2>
+              <button
+                onClick={() => {
+                  setShowAddModal(false);
+                  setPenaltyForm({
+                    circle: "",
+                    penaltyType: "",
+                    departmentName: "",
+                    description: "",
+                    latitude: "",
+                    longitude: "",
+                    address: "",
+                    area: "",
+                    images: [],
+                  });
+                  setImagePreview([]);
+                }}
+                className="hover:bg-green-700 rounded-full p-1 transition-colors cursor-pointer"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleSubmitPenalty} className="p-6 space-y-4">
+              {/* Circle and Penalty Type Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Circle <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="circle"
+                    value={penaltyForm.circle}
+                    onChange={handleFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all cursor-pointer"
+                    required
+                  >
+                    <option value="">Select Circle</option>
+                    {circles.map((circle) => (
+                      <option key={circle._id} value={circle._id}>
+                        {circle.name} ({circle.code})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Penalty Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="penaltyType"
+                    value={penaltyForm.penaltyType}
+                    onChange={handleFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all cursor-pointer"
+                    required
+                  >
+                    <option value="">Select Penalty Type</option>
+                    {penaltyTypes.map((type) => (
+                      <option key={type._id} value={type._id}>
+                        {type.name} - {type.subtype}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Department and Area Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Department Name <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="departmentName"
+                    value={penaltyForm.departmentName}
+                    onChange={handleFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all cursor-pointer"
+                    required
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map((dept) => (
+                      <option key={dept._id} value={dept.name}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Area
+                  </label>
+                  <input
+                    type="text"
+                    name="area"
+                    value={penaltyForm.area}
+                    onChange={handleFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+                    placeholder="Enter area"
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={penaltyForm.description}
+                  onChange={handleFormChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all resize-none"
+                  placeholder="Describe the violation..."
+                  rows="3"
+                  required
+                />
+              </div>
+
+              {/* Location Section */}
+              <div className="border-t pt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Location <span className="text-red-500">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleGetLocation}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    Get My Location
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <input
+                      type="number"
+                      name="latitude"
+                      value={penaltyForm.latitude}
+                      onChange={handleFormChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+                      placeholder="Latitude"
+                      step="any"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      name="longitude"
+                      value={penaltyForm.longitude}
+                      onChange={handleFormChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+                      placeholder="Longitude"
+                      step="any"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <input
+                    type="text"
+                    name="address"
+                    value={penaltyForm.address}
+                    onChange={handleFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+                    placeholder="Address (optional)"
+                  />
+                </div>
+              </div>
+
+              {/* Image Upload Section */}
+              <div className="border-t pt-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Image
+                </label>
+                <div className="space-y-3">
+                  {/* Upload Box - Hidden when image is selected */}
+                  {imagePreview.length === 0 && (
+                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 transition-colors cursor-pointer bg-gray-50">
+                      <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                      <span className="text-sm text-gray-500">
+                        Click to upload image
+                      </span>
+                      <span className="text-xs text-gray-400 mt-1">
+                        (1 image max)
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+
+                  {/* Image Preview */}
+                  {imagePreview.length > 0 && (
+                    <div className="relative inline-block">
+                      <img
+                        src={imagePreview[0]}
+                        alt="Preview"
+                        className="w-full h-40 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 opacity-0 hover:opacity-100 transition-opacity cursor-pointer hover:bg-red-600"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setPenaltyForm({
+                      circle: "",
+                      penaltyType: "",
+                      departmentName: "",
+                      description: "",
+                      latitude: "",
+                      longitude: "",
+                      address: "",
+                      area: "",
+                      images: [],
+                    });
+                    setImagePreview([]);
+                  }}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCreating}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {isCreating ? "Creating..." : "Create Penalty"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

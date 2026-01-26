@@ -26,7 +26,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     const refreshResult = await baseQuery(
       { url: "/users/refresh-token", method: "POST" },
       api,
-      extraOptions
+      extraOptions,
     );
 
     const newToken = refreshResult?.data?.data?.accessToken;
@@ -223,6 +223,15 @@ export const apiSlice = createApi({
     }),
     getPenaltiesStats: builder.query({
       query: () => "/penalties/stats",
+    }),
+
+    createPenalty: builder.mutation({
+      query: (formData) => ({
+        url: "/penalties",
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: ["Penalties"],
     }),
 
     ReviewPenalty: builder.mutation({
@@ -443,6 +452,7 @@ export const {
   useDeletePenaltyMutation,
   useUpdatePenaltyMutation,
   useReviewPenaltyMutation,
+  useCreatePenaltyMutation,
   useGetUsersQuery,
   useRegisterUserMutation,
   useGetpenaltiesQuery,
