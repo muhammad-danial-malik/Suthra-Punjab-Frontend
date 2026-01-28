@@ -69,6 +69,7 @@ function Penalties() {
   const [penaltyForm, setPenaltyForm] = useState({
     circle: "",
     penaltyType: "",
+    penaltyTypeName: "", // Track selected penalty type name for subtype filtering
     departmentName: "",
     description: "",
     latitude: "",
@@ -237,10 +238,31 @@ function Penalties() {
   // Handle Add Penalty Form
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setPenaltyForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    if (name === "penaltyType") {
+      // When user selects a penalty type ID, find its name and update form
+      const selectedType = penaltyTypes.find((type) => type._id === value);
+      setPenaltyForm((prev) => ({
+        ...prev,
+        penaltyType: value,
+        penaltyTypeName: selectedType ? selectedType.name : "",
+      }));
+    } else {
+      setPenaltyForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  // Get unique penalty type names
+  const uniquePenaltyTypeNames = [
+    ...new Set(penaltyTypes.map((type) => type.name)),
+  ];
+
+  // Get subtypes for selected penalty type name
+  const getSubtypesForType = (typeName) => {
+    return penaltyTypes.filter((type) => type.name === typeName);
   };
 
   const handleImageUpload = (e) => {
@@ -330,6 +352,7 @@ function Penalties() {
       setPenaltyForm({
         circle: "",
         penaltyType: "",
+        penaltyTypeName: "",
         departmentName: "",
         description: "",
         latitude: "",
@@ -1167,6 +1190,8 @@ function Penalties() {
                   setPenaltyForm({
                     circle: "",
                     penaltyType: "",
+                    penaltyTypeName: "",
+                    penaltyTypeName: "",
                     departmentName: "",
                     description: "",
                     latitude: "",
@@ -1209,24 +1234,58 @@ function Penalties() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Penalty Type <span className="text-red-500">*</span>
+                    Penalty Type Name <span className="text-red-500">*</span>
                   </label>
                   <select
-                    name="penaltyType"
-                    value={penaltyForm.penaltyType}
-                    onChange={handleFormChange}
+                    name="penaltyTypeName"
+                    value={penaltyForm.penaltyTypeName}
+                    onChange={(e) => {
+                      setPenaltyForm((prev) => ({
+                        ...prev,
+                        penaltyTypeName: e.target.value,
+                        penaltyType: "", // Reset subtype selection
+                      }));
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all cursor-pointer"
                     required
                   >
                     <option value="">Select Penalty Type</option>
-                    {penaltyTypes.map((type) => (
-                      <option key={type._id} value={type._id}>
-                        {type.name} - {type.subtype}
+                    {uniquePenaltyTypeNames.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
+
+              {/* Subtype Row - Only show if penalty type name is selected */}
+              {penaltyForm.penaltyTypeName && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Penalty Subtype <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="penaltyType"
+                      value={penaltyForm.penaltyType}
+                      onChange={handleFormChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all cursor-pointer bg-blue-50"
+                      required
+                    >
+                      <option value="">Select Subtype</option>
+                      {getSubtypesForType(penaltyForm.penaltyTypeName).map(
+                        (type) => (
+                          <option key={type._id} value={type._id}>
+                            {type.subtype || "No Subtype"}{" "}
+                            {type.amount ? `- ${type.amount} Rs` : ""}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </div>
+                </div>
+              )}
 
               {/* Department and Area Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
