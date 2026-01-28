@@ -230,6 +230,7 @@ export const apiSlice = createApi({
         url: "/penalties",
         method: "POST",
         body: formData,
+        formData: true,
       }),
       invalidatesTags: ["Penalties"],
     }),

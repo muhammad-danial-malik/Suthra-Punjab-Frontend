@@ -1240,11 +1240,26 @@ function Penalties() {
                     name="penaltyTypeName"
                     value={penaltyForm.penaltyTypeName}
                     onChange={(e) => {
-                      setPenaltyForm((prev) => ({
-                        ...prev,
-                        penaltyTypeName: e.target.value,
-                        penaltyType: "", // Reset subtype selection
-                      }));
+                      const selectedName = e.target.value;
+
+                      // If not Heap, auto-select the single penalty type ID
+                      if (selectedName && selectedName !== "Heap") {
+                        const matchingTypes = penaltyTypes.filter(
+                          (type) => type.name === selectedName,
+                        );
+                        setPenaltyForm((prev) => ({
+                          ...prev,
+                          penaltyTypeName: selectedName,
+                          penaltyType: matchingTypes[0]?._id || "",
+                        }));
+                      } else {
+                        // For Heap, reset and let user select subtype
+                        setPenaltyForm((prev) => ({
+                          ...prev,
+                          penaltyTypeName: selectedName,
+                          penaltyType: "",
+                        }));
+                      }
                     }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all cursor-pointer"
                     required
@@ -1259,31 +1274,29 @@ function Penalties() {
                 </div>
               </div>
 
-              {/* Subtype Row - Only show if penalty type name is selected */}
-              {penaltyForm.penaltyTypeName && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Penalty Subtype <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="penaltyType"
-                      value={penaltyForm.penaltyType}
-                      onChange={handleFormChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all cursor-pointer bg-blue-50"
-                      required
-                    >
-                      <option value="">Select Subtype</option>
-                      {getSubtypesForType(penaltyForm.penaltyTypeName).map(
-                        (type) => (
-                          <option key={type._id} value={type._id}>
-                            {type.subtype || "No Subtype"}{" "}
-                            {type.amount ? `- ${type.amount} Rs` : ""}
-                          </option>
-                        ),
-                      )}
-                    </select>
-                  </div>
+              {/* Subtype Row - Only show if penalty type name is Heap */}
+              {penaltyForm.penaltyTypeName === "Heap" && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Penalty Subtype <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="penaltyType"
+                    value={penaltyForm.penaltyType}
+                    onChange={handleFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all cursor-pointer bg-blue-50"
+                    required
+                  >
+                    <option value="">Select Subtype</option>
+                    {getSubtypesForType(penaltyForm.penaltyTypeName).map(
+                      (type) => (
+                        <option key={type._id} value={type._id}>
+                          {type.subtype || "No Subtype"}{" "}
+                          {type.amount ? `- ${type.amount} Rs` : ""}
+                        </option>
+                      ),
+                    )}
+                  </select>
                 </div>
               )}
 
